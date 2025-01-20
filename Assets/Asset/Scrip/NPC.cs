@@ -26,11 +26,18 @@ public class NPC : MonoBehaviour
             for (int i = 0; i < line.Length; i++)
             {
                 NPCTextContent.text += line[i] ;
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.1f);
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
+
+    public void SkipContent()
+    {
+        StopCoroutine(coroutine);
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
