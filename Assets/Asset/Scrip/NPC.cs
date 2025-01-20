@@ -9,6 +9,8 @@ public class NPC : MonoBehaviour
     public TextMeshProUGUI NPCTextContent;
     public string[] content;
     Coroutine coroutine;
+
+    public QuestItem quesItem;
     public void Start()
     {
         NPCPanel.SetActive(false);
