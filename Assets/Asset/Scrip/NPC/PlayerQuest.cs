@@ -6,20 +6,11 @@ using UnityEngine;
 public class PlayerQuest : MonoBehaviour
 {
     public List<QuestItem> questItems = new List<QuestItem>();
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    
+    //nh?n nhi?m v?
     public void TakeQuest(QuestItem questItem)
     {
-        questItems.Add(questItem);
+        var check = questItems.Find(x => x.QuestItemName == questItem.QuestItemName);
+        if (check != null) questItems.Add(questItem);
     }
 }
