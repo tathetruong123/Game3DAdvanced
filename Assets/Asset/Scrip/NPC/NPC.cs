@@ -11,10 +11,15 @@ public class NPC : MonoBehaviour
     Coroutine coroutine;
 
     public QuestItem quesItem;
+
+    public PlayerQuest playerQuest;
+
+    public GameObject buttonTakeQuest;
     public void Start()
     {
         NPCPanel.SetActive(false);
         NPCTextContent.text = "";
+        buttonTakeQuest.SetActive(false);
     }
 
     IEnumerator ReadContent()
@@ -30,6 +35,7 @@ public class NPC : MonoBehaviour
             }
             yield return new WaitForSeconds(0.1f);
         }
+        buttonTakeQuest.SetActive(true);
     }
 
     public void SkipContent()
@@ -42,6 +48,7 @@ public class NPC : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
+            playerQuest = other.gameObject.GetComponent<PlayerQuest>();
             NPCPanel.SetActive(true);
             coroutine = StartCoroutine(ReadContent());
         }
@@ -53,6 +60,16 @@ public class NPC : MonoBehaviour
         {
             NPCPanel.SetActive(false);
             StopCoroutine(coroutine);
+        }
+    }
+
+    public void TakeQuest()
+    {
+        if(playerQuest != null)
+        {
+            playerQuest.TakeQuest(quesItem);
+            buttonTakeQuest.SetActive(false);
+            NPCPanel.SetActive(false);
         }
     }
 }
