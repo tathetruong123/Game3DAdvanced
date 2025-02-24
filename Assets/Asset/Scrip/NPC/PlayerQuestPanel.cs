@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerQuestPanel : MonoBehaviour
@@ -7,6 +8,8 @@ public class PlayerQuestPanel : MonoBehaviour
     private bool isShow = false;
     private Vector3 initialPosition;
     private Coroutine coroutine;
+
+    public TextMeshProUGUI questItemPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -52,4 +55,24 @@ public class PlayerQuestPanel : MonoBehaviour
 
         }
     }
+
+    public void ShowAllQuestItems(List<QuestItem> questItems)
+    {
+        for(int i = 0; i < questItemPrefab.transform.parent.childCount; i++)
+        {
+            if (questItemPrefab.transform.parent.GetChild(i).gameObject != questItemPrefab.gameObject)
+            {
+                Destroy(questItemPrefab.transform.parent.GetChild(i).gameObject);
+            }
+
+        }
+         foreach (var item in questItems)
+         {
+            var questItem = Instantiate(questItemPrefab, questItemPrefab.transform.parent);
+            questItem.text = $"{item.QuestItemName}: {item.CurrentAmount}/{item.QuestTargetAmount}";
+            questItem.gameObject.SetActive(true);
+            questItem.transform.parent = questItemPrefab.transform.parent;
+         } 
+    }
+    
 }
