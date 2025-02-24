@@ -176,11 +176,23 @@ public class HPMP : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.gameObject.CompareTag("Boss"))
+    //    {
+    //        TakeDamage(2); // Giảm máu khi bị Zombie tấn công
+    //    }
+    //}
+    void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Zombie"))
+        if (other.CompareTag("Boss"))
         {
-            TakeDamage(2); // Giảm máu khi bị Zombie tấn công
+            HPMP enemy = other.GetComponent<HPMP>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(50);
+                Debug.Log("Hit Boss! Boss HP: " + enemy.currentHP);
+            }
         }
     }
 
