@@ -178,7 +178,7 @@ public class HPMP : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Zombie"))
+        if (other.gameObject.CompareTag("Enemy"))
         {
             TakeDamage(2); // Giảm máu khi bị Zombie tấn công
         }
