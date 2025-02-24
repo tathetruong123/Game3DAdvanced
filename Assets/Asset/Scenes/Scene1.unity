@@ -24697,10 +24697,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 322fe7525faa90647b580ce6ca3d3cc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  QuestItemName: 
+  QuestItemName: "Ti\xEAu di\u1EC7t qu\xE1i"
   QuestTargetAmount: 0
   CurrentAmount: 0
-  TargetItemTag: 
+  TargetItemTag: Zombie
 --- !u!1001 &3248022786172802627
 PrefabInstance:
   m_ObjectHideFlags: 0
