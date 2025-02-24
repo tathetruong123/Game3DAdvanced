@@ -10,10 +10,10 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("Scene1");
     }
+
     public void Quit()
     {
         Application.Quit();
-        Debug.Log("Play Has Quit The Game");
-
+        Debug.Log("Player Has Quit The Game");
     }
 }
