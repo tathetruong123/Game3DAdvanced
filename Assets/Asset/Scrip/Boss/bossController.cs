@@ -14,6 +14,8 @@ public class EnemyController : MonoBehaviour
     private bool isAttacking = false;
     private bool playerInSight = false;
 
+    private int[] attackDamages = { 15, 18, 20, 14 }; // Tổng là 67
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -26,9 +28,9 @@ public class EnemyController : MonoBehaviour
     {
         if (player == null) return;
         float distance = Vector3.Distance(transform.position, player.transform.position);
-        HPMP  playerHealth = player.GetComponent<HPMP>();
+        HPMP HP = player.GetComponent<HPMP>();
 
-        if (playerHealth != null && playerHealth.currentHP <= 0)
+        if (HP != null && HP.currentHP <= 0)
         {
             Jump();
             return;
@@ -40,7 +42,7 @@ public class EnemyController : MonoBehaviour
         {
             playerInSight = true;
             FacePlayer();
-            if (playerHealth != null && playerHealth.currentHP < 100)
+            if (HP != null && HP.currentHP < 100)
             {
                 Run();
             }
@@ -74,8 +76,23 @@ public class EnemyController : MonoBehaviour
         isAttacking = true;
         FacePlayer();
         animator.SetTrigger($"Attack{attackState}");
+
+        // Gọi hàm gây sát thương khi attack animation xảy ra
+        Invoke("DealDamage", 0.5f);
+
         attackState = attackState % 4 + 1;
         Invoke("ResetAttack", 1.5f);
+    }
+
+    void DealDamage()
+    {
+        if (player == null) return;
+
+        HPMP HP = player.GetComponent<HPMP>();
+        if (HP != null)
+        {
+            HP.TakeDamage(attackDamages[attackState - 1]);
+        }
     }
 
     void ResetAttack()
