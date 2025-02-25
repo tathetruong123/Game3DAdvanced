@@ -16934,6 +16934,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4906118899592192682, guid: b1aad125634a32a43920ac986c185422, type: 3}
+      propertyPath: m_LODs.Array.data[0].screenRelativeHeight
+      value: 0.7353897
+      objectReference: {fileID: 0}
+    - target: {fileID: 4906118899592192682, guid: b1aad125634a32a43920ac986c185422, type: 3}
+      propertyPath: m_LODs.Array.data[1].screenRelativeHeight
+      value: 0.43122667
+      objectReference: {fileID: 0}
     - target: {fileID: 4906118899592192683, guid: b1aad125634a32a43920ac986c185422, type: 3}
       propertyPath: m_Name
       value: PT_Wooden_Bridge_02 (1)
