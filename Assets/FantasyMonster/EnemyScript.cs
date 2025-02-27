@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,78 +8,122 @@ public class EnemyScript : MonoBehaviour
     [SerializeField]
     private NavMeshAgent navMeshAgent;
     [SerializeField]
-    private float radius = 10f;
+    private float detectionRadius = 10f;
+    [SerializeField]
+    private float attackRadius = 2f;
     [SerializeField]
     private Transform target;
 
-    private Vector3 OriginalPosition;
+    private Vector3 originalPosition;
     [SerializeField]
     private float maxDistance = 50f;
-    
-    public enum EnemyState
-    {
-        Idle, Attack, Die
-    }
+
+    public enum EnemyState { Idle, Walk, Attack, Die }
     public EnemyState currentState;
     public Animator animator;
 
-    public int maxHP, currentHP;
-    // Start is called before the first frame update
+    public int maxHP = 100, currentHP;
+    public int attackDamage = 10;
+    private bool isAttacking = false;
+
     void Start()
     {
         currentHP = maxHP;
-        OriginalPosition = transform.position;
+        originalPosition = transform.position;
+        ChangeState(EnemyState.Idle);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(currentState == EnemyState.Die)
+        if (currentState == EnemyState.Die) return;
+
+        float distanceToTarget = Vector3.Distance(target.position, transform.position);
+        float distanceFromStart = Vector3.Distance(originalPosition, transform.position);
+
+        if (distanceToTarget <= attackRadius)
         {
-            return;
+            if (!isAttacking)
+            {
+                StartCoroutine(AttackPlayer());
+            }
         }
-
-        var distanceSoVoiBanDau = Vector3.Distance(OriginalPosition,transform.position);
-        
-        
-        var distance = Vector3.Distance(target.position, transform.position);
-
-        if (distance < radius && distanceSoVoiBanDau < maxDistance)
+        else if (distanceToTarget < detectionRadius && distanceFromStart < maxDistance)
         {
             navMeshAgent.SetDestination(target.position);
+            if (currentState != EnemyState.Attack) // Ensure Walk animation plays when chasing
+            {
+                ChangeState(EnemyState.Walk);
+            }
         }
-        if (distance > radius || distanceSoVoiBanDau > maxDistance)
+        else
         {
-            navMeshAgent.SetDestination(OriginalPosition);
+            navMeshAgent.SetDestination(originalPosition);
+            if (Vector3.Distance(transform.position, originalPosition) < 0.5f)
+            {
+                ChangeState(EnemyState.Idle);
+            }
         }
     }
-    public void ChangeState (EnemyState newState)
+
+    IEnumerator AttackPlayer()
     {
-        switch(currentState)
+        isAttacking = true;
+        ChangeState(EnemyState.Attack);
+        while (Vector3.Distance(target.position, transform.position) <= attackRadius)
         {
-            case EnemyState.Idle: break;
-            case EnemyState.Attack: break;
-            case EnemyState.Die: break;
+            yield return new WaitForSeconds(1f);
+            //target.GetComponent<PlayerHealth>()?.TakeDamage(attackDamage);
+        }
+        isAttacking = false;
+        ChangeState(EnemyState.Walk);
+    }
+
+    public void ChangeState(EnemyState newState)
+    {
+        if (currentState == newState) return;
+
+        switch (currentState)
+        {
+            case EnemyState.Idle:
+                animator.SetBool("isIdle", false);
+                break;
+            case EnemyState.Walk:
+                animator.SetBool("isWalking", false);
+                break;
+            case EnemyState.Attack:
+                animator.SetBool("isAttacking", false);
+                break;
+            case EnemyState.Die:
+                return;
         }
 
         switch (newState)
         {
-            case EnemyState.Idle: break;
-            case EnemyState.Attack: break;
-            case EnemyState.Die: break;
-                animator.SetTrigger("Die");
+            case EnemyState.Idle:
+                animator.SetBool("isIdle", true);
+                break;
+            case EnemyState.Walk:
+                animator.SetBool("isWalking", true);
+                break;
+            case EnemyState.Attack:
+                animator.SetBool("isAttacking", true);
+                break;
+            case EnemyState.Die:
+                animator.SetTrigger("isDead");
+                navMeshAgent.isStopped = true;
                 Destroy(gameObject, 2f);
+                break;
         }
 
         currentState = newState;
     }
-    public void TakeDmg(int dmg)
+
+    public void TakeDamage(int dmg)
     {
         currentHP -= dmg;
-        currentHP = Mathf.Max(0, currentHP);
-        if(currentHP < 0)
+        if (currentHP <= 0)
         {
             ChangeState(EnemyState.Die);
         }
     }
-} 
+}
