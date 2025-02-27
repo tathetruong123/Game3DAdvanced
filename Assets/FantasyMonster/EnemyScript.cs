@@ -50,7 +50,7 @@ public class EnemyScript : MonoBehaviour
         else if (distanceToTarget < detectionRadius && distanceFromStart < maxDistance)
         {
             navMeshAgent.SetDestination(target.position);
-            if (currentState != EnemyState.Attack) // Ensure Walk animation plays when chasing
+            if (currentState != EnemyState.Attack)
             {
                 ChangeState(EnemyState.Walk);
             }
@@ -69,11 +69,18 @@ public class EnemyScript : MonoBehaviour
     {
         isAttacking = true;
         ChangeState(EnemyState.Attack);
+
         while (Vector3.Distance(target.position, transform.position) <= attackRadius)
         {
-            yield return new WaitForSeconds(1f);
-            //target.GetComponent<PlayerHealth>()?.TakeDamage(attackDamage);
+            yield return new WaitForSeconds(2f); // Tấn công mỗi giây
+            HPMP playerHP = target.GetComponent<HPMP>(); // Lấy script HPMP của Player
+            if (playerHP != null)
+            {
+                playerHP.TakeDamage(attackDamage); // Gây sát thương
+                Debug.Log("Quái tấn công Player! Máu còn lại: " + playerHP.currentHP);
+            }
         }
+
         isAttacking = false;
         ChangeState(EnemyState.Walk);
     }
@@ -121,9 +128,12 @@ public class EnemyScript : MonoBehaviour
     public void TakeDamage(int dmg)
     {
         currentHP -= dmg;
+        Debug.Log("Enemy bị tấn công! HP còn lại: " + currentHP);
+
         if (currentHP <= 0)
         {
             ChangeState(EnemyState.Die);
         }
     }
+
 }

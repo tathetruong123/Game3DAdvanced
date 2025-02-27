@@ -28,11 +28,9 @@ public class HPMP : MonoBehaviour
 
     private void Start()
     {
-        // Khởi tạo giá trị ban đầu
         currentHP = maxHP;
         currentMP = maxMP;
 
-        // Cập nhật thanh máu và mana
         if (healthBar != null)
         {
             healthBar.maxValue = maxHP;
@@ -45,16 +43,12 @@ public class HPMP : MonoBehaviour
             mpBar.value = currentMP;
         }
 
-        // Khởi tạo AudioSource
         audioSource = GetComponent<AudioSource>();
-
-        // Cập nhật số bình khi bắt đầu
         UpdatePotionText();
     }
 
     private void Update()
     {
-        // Kiểm tra trạng thái chạy nhanh
         isSprinting = Input.GetKey(KeyCode.LeftShift) && currentMP > 0;
 
         if (isSprinting)
@@ -66,27 +60,23 @@ public class HPMP : MonoBehaviour
             RegenerateMP(Time.deltaTime * mpRegenRate);
         }
 
-        // Hồi máu khi nhấn phím số 1 (nếu còn bình)
         if (Input.GetKeyDown(KeyCode.Alpha1) && healingPotionCount > 0)
         {
-            Heal(20); // Hồi 20 máu
-            healingPotionCount--; // Trừ đi 1 bình
-            UpdatePotionText(); // Cập nhật số bình còn lại
+            Heal(20);
+            healingPotionCount--;
+            UpdatePotionText();
         }
 
-        // Hồi mana khi nhấn phím số 2 (nếu còn bình)
         if (Input.GetKeyDown(KeyCode.Alpha2) && manaPotionCount > 0)
         {
-            RestoreMana(15); // Hồi 15 mana
-            manaPotionCount--; // Trừ đi 1 bình
-            UpdatePotionText(); // Cập nhật số bình còn lại
+            RestoreMana(15);
+            manaPotionCount--;
+            UpdatePotionText();
         }
 
-        // Kiểm tra nếu máu về 0
         if (currentHP <= 0)
         {
             Debug.Log("Nhân vật đã chết!");
-            // Xử lý logic khi nhân vật chết, ví dụ kết thúc trò chơi
         }
     }
 
@@ -164,7 +154,6 @@ public class HPMP : MonoBehaviour
 
     private void UpdatePotionText()
     {
-        // Cập nhật số bình hồi máu và mana trong TextMeshPro
         if (healingPotionText != null)
         {
             healingPotionText.text = healingPotionCount.ToString();
@@ -176,25 +165,19 @@ public class HPMP : MonoBehaviour
         }
     }
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.gameObject.CompareTag("Boss"))
-    //    {
-    //        TakeDamage(2); // Giảm máu khi bị Zombie tấn công
-    //    }
-    //}
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Boss"))
+        if (other.CompareTag("Enemy")) // Kiểm tra nếu va chạm với quái
         {
-            HPMP enemy = other.GetComponent<HPMP>();
+            EnemyScript enemy = other.GetComponent<EnemyScript>();
             if (enemy != null)
             {
-                enemy.TakeDamage(50);
-                Debug.Log("Hit Boss! Boss HP: " + enemy.currentHP);
+                enemy.TakeDamage(50); // Gây 50 sát thương cho quái
+                Debug.Log("Chém trúng Enemy! Máu quái còn: " + enemy.currentHP);
             }
         }
     }
+
 
     public virtual void TakeDamage(float damage)
     {
