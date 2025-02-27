@@ -4,7 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Zombie
+  - NPC
+  - Boss
   layers:
   - Default
   - TransparentFX
