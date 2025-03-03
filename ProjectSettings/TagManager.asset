@@ -7,6 +7,8 @@ TagManager:
   - NPC
   - Boss
   - Enemy
+  - ManaPotion
+  - HealthPotion
   layers:
   - Default
   - TransparentFX
