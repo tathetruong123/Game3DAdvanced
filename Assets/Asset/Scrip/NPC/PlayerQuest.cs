@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,6 +8,8 @@ public class PlayerQuest : MonoBehaviour
 {
     public List<QuestItem> questItems = new List<QuestItem>();
     public PlayerQuestPanel playerQuestPanel;
+    
+    
 
     private void Awake()
     {
@@ -31,8 +34,9 @@ public class PlayerQuest : MonoBehaviour
     // Cập nhật tiến độ nhiệm vụ khi tiêu diệt quái
     public void UpdateQuestProgress(string enemyName)
     {
-        var quest = questItems.FirstOrDefault(x => x.QuestItemName == enemyName);
-        if (quest != null)
+        var quest = questItems.FirstOrDefault(x => x.QuestItemName.Equals(enemyName, StringComparison.OrdinalIgnoreCase));
+
+        if (quest.CurrentAmount < quest.QuestTargetAmount)
         {
             quest.CurrentAmount++;
             UpdateQuestPanel();
@@ -47,4 +51,15 @@ public class PlayerQuest : MonoBehaviour
             playerQuestPanel.ShowAllQuestItems(questItems);
         }
     }
+
+    public void CollectItem(QuestItem collectedItem)
+    {
+        var quest = questItems.FirstOrDefault(x => x.QuestItemName == collectedItem.QuestItemName);
+        if (quest != null && quest.CurrentAmount < quest.QuestTargetAmount)
+        {
+            quest.CurrentAmount++;
+            UpdateQuestPanel();
+        }
+    }
+
 }

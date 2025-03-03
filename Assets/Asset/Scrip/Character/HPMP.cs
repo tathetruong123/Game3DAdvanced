@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class HPMP : MonoBehaviour
 {
@@ -25,6 +25,16 @@ public class HPMP : MonoBehaviour
 
     public TMP_Text healingPotionText; // TextMeshPro để hiển thị số bình hồi máu
     public TMP_Text manaPotionText; // TextMeshPro để hiển thị số bình mana
+
+    public TMP_Text HpIV;
+    public TMP_Text MpIV;
+    private void PotionText()
+    {
+        healingPotionText.text = healingPotionCount.ToString();
+        manaPotionText.text = manaPotionCount.ToString();
+        HpIV.text = healingPotionCount.ToString();
+        MpIV.text = manaPotionCount.ToString();
+    }
 
     private void Start()
     {
@@ -78,6 +88,8 @@ public class HPMP : MonoBehaviour
         {
             Debug.Log("Nhân vật đã chết!");
         }
+
+        PotionText();
     }
 
     private void Heal(float amount)
@@ -181,6 +193,32 @@ public class HPMP : MonoBehaviour
                 }
             }
         }
+        if (other.CompareTag("HealthPotion")) // Kiểm tra nếu va chạm với bình máu
+        {
+            PickupPotion("Health", 1);
+            Destroy(other.gameObject); // Xóa bình máu khỏi scene
+        }
+        else if (other.CompareTag("ManaPotion")) // Kiểm tra nếu va chạm với bình mana
+        {
+            PickupPotion("Mana", 1);
+            Destroy(other.gameObject); // Xóa bình mana khỏi scene
+        }
+
+    }
+    public void PickupPotion(string potionType, int amount)
+    {
+        if (potionType == "Health")
+        {
+            healingPotionCount += amount;
+            Debug.Log($"Nhặt {amount} bình máu. Tổng số bình: {healingPotionCount}");
+        }
+        else if (potionType == "Mana")
+        {
+            manaPotionCount += amount;
+            Debug.Log($"Nhặt {amount} bình mana. Tổng số bình: {manaPotionCount}");
+        }
+
+        UpdatePotionText();
     }
 
 
@@ -195,4 +233,5 @@ public class HPMP : MonoBehaviour
             Debug.Log("Nhân vật đã chết do bị tấn công!");
         }
     }
+
 }
