@@ -1,33 +1,44 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
-public class EnemyController : MonoBehaviour
+public class bossController : MonoBehaviour
 {
     private Animator animator;
-    private Rigidbody rb;
+    private NavMeshAgent agent;
     private GameObject player;
     private int enemyHealth = 500;
     private int attackState = 1;
     private float attackResetTime = 15f;
     private float lastAttackTime;
-    private float walkSpeed = 4f;
-    private float runSpeed = 9f;
     private bool isAttacking = false;
     private bool playerInSight = false;
-
-    private int[] attackDamages = { 15, 18, 20, 14 }; // Tổng là 67
+    private int[] attackDamages = { 15, 18, 20, 14 }; 
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player");
+
+        if (agent == null)
+        {
+            Debug.LogError("NavMeshAgent is missing on " + gameObject.name);
+            enabled = false;
+            return;
+        }
+
+        agent.speed = 4f;
+        agent.stoppingDistance = 2.5f;
         Sleep();
     }
 
     void Update()
     {
         if (player == null) return;
+
         float distance = Vector3.Distance(transform.position, player.transform.position);
+        Debug.Log("Khoảng cách tới nhân vật: " + distance);
+
         HPMP HP = player.GetComponent<HPMP>();
 
         if (HP != null && HP.currentHP <= 0)
@@ -38,10 +49,14 @@ public class EnemyController : MonoBehaviour
 
         if (isAttacking) return;
 
-        if (distance < 5f)
+        if (distance < 10f) // Giảm khoảng cách phát hiện
         {
+            Debug.Log("Boss đã phát hiện nhân vật!");
             playerInSight = true;
             FacePlayer();
+            agent.isStopped = false;
+            agent.SetDestination(player.transform.position);
+
             if (HP != null && HP.currentHP < 100)
             {
                 Run();
@@ -55,6 +70,7 @@ public class EnemyController : MonoBehaviour
         {
             if (playerInSight)
             {
+                Debug.Log("Boss mất dấu nhân vật!");
                 playerInSight = false;
                 Idle();
                 Invoke("Sleep", 3f);
@@ -76,10 +92,7 @@ public class EnemyController : MonoBehaviour
         isAttacking = true;
         FacePlayer();
         animator.SetTrigger($"Attack{attackState}");
-
-        // Gọi hàm gây sát thương khi attack animation xảy ra
         Invoke("DealDamage", 0.5f);
-
         attackState = attackState % 4 + 1;
         Invoke("ResetAttack", 1.5f);
     }
@@ -117,6 +130,7 @@ public class EnemyController : MonoBehaviour
         animator.SetTrigger("Idle1");
         animator.SetBool("IsWalking", false);
         animator.SetBool("IsRunning", false);
+        agent.isStopped = true;
     }
 
     void Jump()
@@ -126,16 +140,22 @@ public class EnemyController : MonoBehaviour
 
     void Walk()
     {
+        if (!playerInSight) return;
         animator.SetBool("IsWalking", true);
         animator.SetBool("IsRunning", false);
-        rb.velocity = transform.forward * walkSpeed;
+        agent.speed = 4f;
+        agent.isStopped = false;
+        agent.SetDestination(player.transform.position);
     }
 
     void Run()
     {
+        if (!playerInSight) return;
         animator.SetBool("IsRunning", true);
         animator.SetBool("IsWalking", false);
-        rb.velocity = transform.forward * runSpeed;
+        agent.speed = 9f;
+        agent.isStopped = false;
+        agent.SetDestination(player.transform.position);
     }
 
     void Sleep()
