@@ -8,4 +8,6 @@ public class QuestItem : MonoBehaviour
     public int QuestTargetAmount;
     public int CurrentAmount;
     public string TargetItemTag;
+
+   
 }
