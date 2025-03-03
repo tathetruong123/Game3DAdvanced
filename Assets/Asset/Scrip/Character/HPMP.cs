@@ -179,13 +179,18 @@ public class HPMP : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy")) // Kiểm tra nếu va chạm với quái
+        if (other.CompareTag("Enemy"))
         {
-            EnemyScript enemy = other.GetComponent<EnemyScript>();
-            if (enemy != null)
+            // Kiểm tra xem Player có đang ở trạng thái Attack không
+            Animator animator = GetComponent<Animator>();
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
             {
-                enemy.TakeDamage(50); // Gây 50 sát thương cho quái
-                Debug.Log("Chém trúng Enemy! Máu quái còn: " + enemy.currentHP);
+                EnemyScript enemy = other.GetComponent<EnemyScript>();
+                if (enemy != null)
+                {
+                    enemy.TakeDamage(20); // Chỉ gây sát thương khi Player đang chém
+                    Debug.Log("Chém trúng Enemy! Máu quái còn: " + enemy.currentHP);
+                }
             }
         }
         if (other.CompareTag("HealthPotion")) // Kiểm tra nếu va chạm với bình máu
