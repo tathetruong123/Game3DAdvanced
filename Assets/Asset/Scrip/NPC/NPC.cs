@@ -1,75 +1,81 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Fusion;
+using System;
 
-public class NPC : MonoBehaviour
+public class NPC : NetworkBehaviour
 {
     public GameObject NPCPanel;
     public TextMeshProUGUI NPCTextContent;
     public string[] content;
-    Coroutine coroutine;
-
-    public QuestItem quesItem;
-
-    public PlayerQuest playerQuest;
-
+    private Coroutine coroutine;
+    public QuestItem questItem;
     public GameObject buttonTakeQuest;
-    public void Start()
+    private PlayerQuest currentPlayer;
+
+    private void Start()
     {
         NPCPanel.SetActive(false);
         NPCTextContent.text = "";
         buttonTakeQuest.SetActive(false);
     }
 
-    IEnumerator ReadContent()
+    private IEnumerator ReadContent()
     {
-        
         foreach (var line in content)
         {
             NPCTextContent.text = "";
-            for (int i = 0; i < line.Length; i++)
+            foreach (char c in line)
             {
-                NPCTextContent.text += line[i] ;
-                yield return new WaitForSeconds(0.1f);
+                NPCTextContent.text += c;
+                yield return new WaitForSeconds(0.05f);
             }
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.5f);
         }
         buttonTakeQuest.SetActive(true);
     }
 
-    public void SkipContent()
-    {
-        StopCoroutine(coroutine);
-    }
-
-
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            playerQuest = other.gameObject.GetComponent<PlayerQuest>();
-            NPCPanel.SetActive(true);
-            coroutine = StartCoroutine(ReadContent());
+            currentPlayer = other.GetComponent<PlayerQuest>();
+            if (currentPlayer != null && currentPlayer.HasInputAuthority)
+            {
+                NPCPanel.SetActive(true);
+                coroutine = StartCoroutine(ReadContent());
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
             NPCPanel.SetActive(false);
-            StopCoroutine(coroutine);
+            if (coroutine != null) StopCoroutine(coroutine);
+            currentPlayer = null;
         }
     }
 
     public void TakeQuest()
     {
-        if(playerQuest != null)
+        if (currentPlayer != null)
         {
-            playerQuest.TakeQuest(quesItem);
+            RPC_TakeQuest(currentPlayer.Object.InputAuthority);
             buttonTakeQuest.SetActive(false);
             NPCPanel.SetActive(false);
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_TakeQuest(PlayerRef playerRef)
+    {
+        PlayerQuest player = Runner.GetPlayerObject(playerRef)?.GetComponent<PlayerQuest>();
+        if (player != null)
+        {
+            player.TakeQuest(questItem);
         }
     }
 }
